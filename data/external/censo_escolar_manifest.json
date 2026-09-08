@@ -1,0 +1,99 @@
+{
+  "dataset": "Censo Escolar - características municipais por rede",
+  "official_source": "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar",
+  "generated_at_utc": "2026-09-08T03:31:51.593199+00:00",
+  "temporal_strategy": {
+    "avaliacao_2023": "censo_escolar_2022",
+    "avaliacao_2024": "censo_escolar_2023"
+  },
+  "join_strategy": {
+    "gold_key": [
+      "id_municipio",
+      "rede"
+    ],
+    "censo_key": [
+      "CO_MUNICIPIO",
+      "rede"
+    ],
+    "aggregation": [
+      "CO_MUNICIPIO",
+      "TP_DEPENDENCIA"
+    ],
+    "dependencia_mapping": {
+      "1": "Federal",
+      "2": "Estadual",
+      "3": "Municipal",
+      "4": "Privada"
+    }
+  },
+  "missing_data_policy": {
+    "empty_values": "converted_to_null",
+    "binary_proportions": "calculated only over schools with valid information",
+    "quantitative_means": "calculated only over schools with valid information",
+    "coverage_metrics": "created to retain information about missingness",
+    "zero_imputation": false
+  },
+  "selected_columns": [
+    "CO_MUNICIPIO",
+    "TP_DEPENDENCIA",
+    "TP_LOCALIZACAO",
+    "TP_LOCALIZACAO_DIFERENCIADA",
+    "IN_AGUA_POTAVEL",
+    "IN_AGUA_REDE_PUBLICA",
+    "IN_ENERGIA_REDE_PUBLICA",
+    "IN_ESGOTO_REDE_PUBLICA",
+    "IN_LIXO_SERVICO_COLETA",
+    "IN_BANHEIRO_PNE",
+    "IN_BIBLIOTECA",
+    "IN_BIBLIOTECA_SALA_LEITURA",
+    "IN_LABORATORIO_CIENCIAS",
+    "IN_LABORATORIO_INFORMATICA",
+    "IN_PATIO_COBERTO",
+    "IN_PATIO_DESCOBERTO",
+    "IN_PARQUE_INFANTIL",
+    "IN_QUADRA_ESPORTES",
+    "IN_ACESSIBILIDADE_CORRIMAO",
+    "IN_ACESSIBILIDADE_RAMPAS",
+    "IN_ACESSIBILIDADE_SINAL_VISUAL",
+    "IN_COMPUTADOR",
+    "IN_INTERNET",
+    "IN_INTERNET_APRENDIZAGEM",
+    "IN_BANDA_LARGA",
+    "QT_SALAS_UTILIZADAS",
+    "QT_DESKTOP_ALUNO",
+    "QT_COMP_PORTATIL_ALUNO",
+    "QT_TABLET_ALUNO",
+    "QT_MAT_BAS",
+    "QT_DOC_BAS"
+  ],
+  "temporal_harmonization": {
+    "TP_LOCALIZACAO_DIFERENCIADA": "harmonized as binary: 0 = not differentiated; 1/2/3/8 = differentiated. Category 8 appears in 2023 and is grouped with the other differentiated categories to preserve a consistent meaning across years"
+  },
+  "excluded_after_schema_validation": {
+    "QT_FUNCIONARIOS": "absent from the 2023 main CSV; excluded to keep a consistent schema"
+  },
+  "years_processed": [
+    2022,
+    2023
+  ],
+  "outputs": [
+    {
+      "year": 2022,
+      "input_zip": "/home/erick/Downloads/microdados_censo_escolar_2022.zip",
+      "input_csv_inside_zip": "Microdados do Censo Escolar da Educaç╞o Básica 2022/dados/microdados_ed_basica_2022.csv",
+      "input_rows": 224649,
+      "output_file": "/home/erick/Projetos/tech_challenge_3_alfabetizacao/data/external/censo_escolar_municipio_rede_2022.parquet",
+      "output_rows": 15386,
+      "output_columns": 75
+    },
+    {
+      "year": 2023,
+      "input_zip": "/home/erick/Downloads/microdados_censo_escolar_2023.zip",
+      "input_csv_inside_zip": "microdados_censo_escolar_2023/dados/microdados_ed_basica_2023.csv",
+      "input_rows": 217625,
+      "output_file": "/home/erick/Projetos/tech_challenge_3_alfabetizacao/data/external/censo_escolar_municipio_rede_2023.parquet",
+      "output_rows": 15333,
+      "output_columns": 75
+    }
+  ]
+}
