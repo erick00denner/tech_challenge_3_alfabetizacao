@@ -1,10 +1,20 @@
 {
   "dataset": "Censo Escolar - características municipais por rede",
   "official_source": "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar",
-  "generated_at_utc": "2026-09-08T03:31:51.593199+00:00",
+  "generated_at_utc": "2026-09-09T03:04:05.861695+00:00",
   "temporal_strategy": {
     "avaliacao_2023": "censo_escolar_2022",
     "avaliacao_2024": "censo_escolar_2023"
+  },
+  "school_filter": {
+    "column": "TP_SITUACAO_FUNCIONAMENTO",
+    "included_value": "1",
+    "included_label": "Em Atividade",
+    "excluded_values": {
+      "2": "Paralisada",
+      "3": "Extinta"
+    },
+    "rationale": "Only active schools are used to characterize the educational context available in the census year."
   },
   "join_strategy": {
     "gold_key": [
@@ -28,12 +38,14 @@
   },
   "missing_data_policy": {
     "empty_values": "converted_to_null",
-    "binary_proportions": "calculated only over schools with valid information",
-    "quantitative_means": "calculated only over schools with valid information",
-    "coverage_metrics": "created to retain information about missingness",
+    "binary_proportions": "calculated only over active schools with valid information",
+    "quantitative_means": "calculated only over active schools with valid information",
+    "quantitative_totals_without_valid_values": "kept_as_null",
+    "coverage_metrics": "percentage of active schools with valid information; zero when no active school in the group has a valid value",
     "zero_imputation": false
   },
   "selected_columns": [
+    "TP_SITUACAO_FUNCIONAMENTO",
     "CO_MUNICIPIO",
     "TP_DEPENDENCIA",
     "TP_LOCALIZACAO",
@@ -82,8 +94,10 @@
       "input_zip": "/home/erick/Downloads/microdados_censo_escolar_2022.zip",
       "input_csv_inside_zip": "Microdados do Censo Escolar da Educaç╞o Básica 2022/dados/microdados_ed_basica_2022.csv",
       "input_rows": 224649,
+      "active_school_rows": 184332,
+      "excluded_non_active_rows": 40317,
       "output_file": "/home/erick/Projetos/tech_challenge_3_alfabetizacao/data/external/censo_escolar_municipio_rede_2022.parquet",
-      "output_rows": 15386,
+      "output_rows": 15075,
       "output_columns": 75
     },
     {
@@ -91,8 +105,10 @@
       "input_zip": "/home/erick/Downloads/microdados_censo_escolar_2023.zip",
       "input_csv_inside_zip": "microdados_censo_escolar_2023/dados/microdados_ed_basica_2023.csv",
       "input_rows": 217625,
+      "active_school_rows": 180230,
+      "excluded_non_active_rows": 37395,
       "output_file": "/home/erick/Projetos/tech_challenge_3_alfabetizacao/data/external/censo_escolar_municipio_rede_2023.parquet",
-      "output_rows": 15333,
+      "output_rows": 15050,
       "output_columns": 75
     }
   ]
