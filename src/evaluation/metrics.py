@@ -55,6 +55,8 @@ TARGET_COLUMN = "alfabetizado"
 PROBABILITY_COLUMN = "prob_nao_alfabetizado"
 PREDICTION_COLUMN = "pred_nao_alfabetizado"
 POSITIVE_LABEL = "Não"
+NEGATIVE_LABEL = "Sim"
+VALID_TARGET_LABELS = {POSITIVE_LABEL, NEGATIVE_LABEL}
 
 REQUIRED_PREDICTION_COLUMNS = {
     TARGET_COLUMN,
@@ -164,6 +166,7 @@ def load_metadata(input_file: Path) -> dict[str, Any]:
         "positive_class",
         "threshold_selection",
         "temporal_test_metrics",
+        "temporal_test_rows",
     }
     missing_blocks = required_blocks - set(metadata)
 
@@ -191,12 +194,20 @@ def build_binary_target(
         Vetor binário com ``1`` para a classe positiva e ``0`` para a negativa.
 
     Raises:
-        RuntimeError: Se o target possuir valores ausentes.
+        RuntimeError: Se o target possuir valores ausentes ou rótulos fora do
+            contrato esperado do projeto.
     """
     target = predictions[TARGET_COLUMN]
 
     if target.isna().any():
         raise RuntimeError(f"A coluna {TARGET_COLUMN!r} possui valores ausentes.")
+
+    unexpected_labels = set(target.unique()) - VALID_TARGET_LABELS
+    if unexpected_labels:
+        raise RuntimeError(
+            f"Valores inesperados na coluna {TARGET_COLUMN!r}: "
+            f"{sorted(unexpected_labels)}; esperado {sorted(VALID_TARGET_LABELS)}."
+        )
 
     return target.eq(positive_label).astype(np.int8).to_numpy()
 
@@ -383,6 +394,13 @@ def evaluate_persisted_predictions(
             f"{positive_class!r}; esperado {POSITIVE_LABEL!r}."
         )
 
+    expected_rows = int(metadata["temporal_test_rows"])
+    if len(predictions) != expected_rows:
+        raise RuntimeError(
+            "Quantidade de linhas do artefato de predições diverge do metadata: "
+            f"encontrado={len(predictions):,}, esperado={expected_rows:,}."
+        )
+
     threshold = float(metadata["threshold_selection"]["threshold"])
 
     artifact_validation = validate_prediction_artifact(
@@ -411,6 +429,7 @@ def evaluate_persisted_predictions(
 
     return {
         "temporal_test_year": int(metadata["temporal_test_year"]),
+        "temporal_test_rows": expected_rows,
         "positive_class": positive_class,
         "threshold": threshold,
         "artifact_validation": artifact_validation,
@@ -431,6 +450,7 @@ def print_evaluation_report(report: Mapping[str, Any]) -> None:
     print(f"Teste temporal: {report['temporal_test_year']}")
     print(f"Classe positiva: {report['positive_class']}")
     print(f"Registros avaliados: {validation['rows']:,}")
+    print(f"Registros esperados (metadata): {report['temporal_test_rows']:,}")
     print(f"Threshold auditado: {report['threshold']:.10f}")
 
     print("\nIntegridade do artefato:")

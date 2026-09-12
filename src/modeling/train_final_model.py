@@ -903,6 +903,7 @@ def save_training_metadata(
     search: RandomizedSearchCV,
     threshold_result: dict[str, float],
     temporal_test_metrics: dict[str, float],
+    temporal_test_rows: int,
     data_diagnostics: dict[str, Any],
     model_file: Path,
 ) -> None:
@@ -913,6 +914,7 @@ def save_training_metadata(
         search: Busca de hiperparâmetros já ajustada.
         threshold_result: Resultado da seleção do threshold OOF.
         temporal_test_metrics: Métricas finais calculadas em 2024.
+        temporal_test_rows: Quantidade de observações do teste temporal de 2024 utilizadas na avaliação, usada para auditoria externa.
         data_diagnostics: Diagnósticos de diferenças categóricas entre o
             desenvolvimento e o teste temporal.
         model_file: Caminho do artefato Joblib persistido localmente.
@@ -951,6 +953,7 @@ def save_training_metadata(
             ),
         },
         "temporal_test_metrics": temporal_test_metrics,
+        "temporal_test_rows": temporal_test_rows,
         "data_diagnostics": data_diagnostics,
         "model_artifact": {
             "file": model_file_metadata,
@@ -1063,6 +1066,7 @@ def train_final_model(
         search=search,
         threshold_result=threshold_result,
         temporal_test_metrics=temporal_test_metrics,
+        temporal_test_rows=len(y_test),
         data_diagnostics=data_diagnostics,
         model_file=model_file,
     )

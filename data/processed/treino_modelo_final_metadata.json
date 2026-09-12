@@ -59,6 +59,7 @@
     "recall": 0.8785537904188481,
     "f1": 0.5761263750173357
   },
+  "temporal_test_rows": 1851852,
   "data_diagnostics": {
     "unknown_categories_temporal_test": {
       "rede": {
