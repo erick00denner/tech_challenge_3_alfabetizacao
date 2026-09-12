@@ -19,7 +19,7 @@ env/
 .vscode/
 .idea/
 
-# Operating system
+# OS
 .DS_Store
 Thumbs.db
 
@@ -31,3 +31,8 @@ Thumbs.db
 # Model artifacts
 *.pkl
 *.joblib
+
+# Temporary files
+*.tmp
+*.temp
+*.log

@@ -1,0 +1,134 @@
+{
+  "random_state": 42,
+  "scikit_learn_version": "1.9.0",
+  "development_year": 2023,
+  "temporal_test_year": 2024,
+  "positive_class": "Não",
+  "group_column": "id_escola",
+  "cv": {
+    "strategy": "StratifiedGroupKFold",
+    "n_splits": 5,
+    "shuffle": true
+  },
+  "optimization": {
+    "strategy": "RandomizedSearchCV",
+    "n_iter": 10,
+    "scoring": "average_precision",
+    "best_score": 0.5659048227784323,
+    "best_params": {
+      "model__max_leaf_nodes": 63,
+      "model__max_iter": 200,
+      "model__learning_rate": 0.1,
+      "model__l2_regularization": 0.0
+    },
+    "parameter_space": {
+      "model__learning_rate": [
+        0.03,
+        0.05,
+        0.1
+      ],
+      "model__max_iter": [
+        100,
+        200
+      ],
+      "model__max_leaf_nodes": [
+        15,
+        31,
+        63
+      ],
+      "model__l2_regularization": [
+        0.0,
+        1.0,
+        5.0
+      ]
+    }
+  },
+  "threshold_selection": {
+    "criterion": "maximize_f1_oof_2023",
+    "threshold": 0.29772079219028125,
+    "precision_oof": 0.4687806340554689,
+    "recall_oof": 0.8900671909329018,
+    "f1_oof": 0.6141177171487316,
+    "application": "embedded_in_persisted_model_predict: positive class when predict_proba[:, 1] >= threshold"
+  },
+  "temporal_test_metrics": {
+    "roc_auc": 0.6030869637946548,
+    "average_precision": 0.5002049479429728,
+    "balanced_accuracy": 0.5453201480124199,
+    "precision": 0.42859108005884966,
+    "recall": 0.8785537904188481,
+    "f1": 0.5761263750173357
+  },
+  "data_diagnostics": {
+    "unknown_categories_temporal_test": {
+      "rede": {
+        "development_categories": [
+          "Estadual",
+          "Municipal"
+        ],
+        "temporal_test_categories": [
+          "Estadual",
+          "Municipal",
+          "Privada"
+        ],
+        "unknown_categories": [
+          "Privada"
+        ],
+        "unknown_category_counts": {
+          "Privada": 24
+        },
+        "affected_rows": 24,
+        "affected_share": 1.2959998963200083e-05,
+        "handling": "OneHotEncoder(handle_unknown='ignore') encodes unseen categories as all zeros in the learned dummy columns",
+        "status": "expected_behavior"
+      }
+    }
+  },
+  "model_artifact": {
+    "file": "model/modelo_final.joblib",
+    "format": "joblib",
+    "persisted": true,
+    "contains_preprocessing": true,
+    "contains_threshold": true,
+    "wrapper_class": "src.modeling.thresholded_model.ThresholdedBinaryClassifier"
+  },
+  "features": [
+    "rede",
+    "qtd_escolas",
+    "pct_tp_localizacao_1",
+    "pct_localizacao_diferenciada",
+    "pct_in_agua_potavel",
+    "pct_in_agua_rede_publica",
+    "pct_in_energia_rede_publica",
+    "pct_in_esgoto_rede_publica",
+    "pct_in_lixo_servico_coleta",
+    "pct_in_banheiro_pne",
+    "pct_in_biblioteca",
+    "pct_in_biblioteca_sala_leitura",
+    "pct_in_laboratorio_ciencias",
+    "pct_in_laboratorio_informatica",
+    "pct_in_patio_coberto",
+    "pct_in_patio_descoberto",
+    "pct_in_parque_infantil",
+    "pct_in_quadra_esportes",
+    "pct_in_acessibilidade_corrimao",
+    "pct_in_acessibilidade_rampas",
+    "pct_in_acessibilidade_sinal_visual",
+    "pct_in_computador",
+    "pct_in_internet",
+    "pct_in_internet_aprendizagem",
+    "pct_in_banda_larga",
+    "media_qt_salas_utilizadas",
+    "media_qt_desktop_aluno",
+    "total_qt_desktop_aluno",
+    "media_qt_comp_portatil_aluno",
+    "total_qt_comp_portatil_aluno",
+    "media_qt_tablet_aluno",
+    "media_qt_mat_bas",
+    "media_qt_doc_bas",
+    "alunos_por_docente",
+    "alunos_por_sala",
+    "dispositivos_aluno_por_100_matriculas"
+  ],
+  "excluded_after_ablation": "meta_alfabetizacao_2025"
+}
