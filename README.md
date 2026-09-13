@@ -165,13 +165,13 @@ análise exploratória, a seleção de variáveis, a interpretabilidade e a apli
 estratégica do modelo. Cada hipótese foi posteriormente confrontada com evidências
 produzidas ao longo dos notebooks.
 
-| Hipótese | Formulação | Evidência principal | Conclusão |
-|---|---|---|---|
-| **H1** | **Infraestrutura escolar como fator contextual de risco.** Municípios com menor cobertura de infraestrutura básica (água potável, saneamento, energia, conectividade, laboratórios) tendem a apresentar maior risco de não alfabetização. | Feature Importance por Permutation Importance e SHAP. | **Sustentada** |
-| **H2** | **Indicadores contemporâneos ao resultado configuram data leakage.** Variáveis medidas no mesmo ciclo avaliativo do desfecho, como a proficiência, captam o resultado diretamente e não um fator de risco anterior a ele. | Compatibilidade de 100% entre o target `alfabetizado` e o ponto de corte de 743 em `proficiencia`. | **Confirmada** |
-| **H3** | **Metas municipais refletem o contexto territorial e institucional, não uma característica individual do aluno.** Sua contribuição preditiva deve ser avaliada separadamente antes da utilização no modelo final. | Análise de ablação da variável `meta_alfabetizacao_2025`. | **Sustentada** |
-| **H4** | **Associações aparentes entre infraestrutura e risco podem refletir confusão por urbanização.** Parte das associações observadas pode ser explicada por fatores de urbanização e porte municipal. | Análises estratificadas e correlação parcial controlando características contextuais. | **Sustentada** |
-| **H5** | **Municípios com perfis de infraestrutura semelhantes apresentam padrões de risco semelhantes.** | Clusterização baseada nas características contextuais e comparação dos níveis de risco e resultados observados. | **Sustentada parcialmente** |
+| Hipótese | Como será investigada | Conclusão |
+|---|---|---|
+| **H1 — Infraestrutura escolar como fator contextual associado ao risco** | Avaliar a relevância e o comportamento das variáveis de infraestrutura por métodos complementares de interpretabilidade — Permutation Importance, SHAP e Partial Dependence — considerando que direção e magnitude das associações podem variar conforme o contexto territorial. | **Sustentada** |
+| **H2 — Indicadores contemporâneos ao resultado configuram data leakage** | Comparar diretamente `alfabetizado`, `proficiencia` e variáveis derivadas do resultado da avaliação antes de qualquer modelagem. | **Confirmada** |
+| **H3 — Meta municipal contém informação preditiva adicional, mas possui natureza contextual** | Avaliar separadamente a contribuição preditiva de `meta_alfabetizacao_2025` por análise de ablação, considerando sua natureza agregada e institucional antes da definição do conjunto final de features. | **Sustentada** |
+| **H4 — Confusão por urbanização e porte** | Investigar se associações contraintuitivas encontradas na interpretabilidade são atenuadas após estratificação e controle por características contextuais dos municípios e escolas. | **Sustentada** |
+| **H5 — Municípios com perfis semelhantes apresentam padrões de risco semelhantes** | Agrupar municípios por características contextuais e comparar os grupos quanto ao risco previsto e à taxa observada de não alfabetização, avaliando também a qualidade da separação obtida. | **Sustentada parcialmente** |
 
 Os resultados mostram diferentes níveis de suporte às hipóteses. A investigação de
 **H2** demonstrou diretamente o data leakage da variável `proficiencia`, cuja
@@ -924,11 +924,11 @@ evidências produzidas ao longo do desenvolvimento:
 
 | Hipótese | Resultado | Evidência principal |
 |---|---|---|
-| **H1 — Infraestrutura escolar como fator contextual de risco** | **Sustentada** | Convergência entre SHAP, Permutation Importance e Partial Dependence |
-| **H2 — Indicadores contemporâneos configuram data leakage** | **Confirmada** | Correspondência exata entre `proficiencia` e a definição do target |
-| **H3 — Meta municipal como informação contextual** | **Sustentada** | Análise de ablação demonstrou contribuição preditiva, seguida de exclusão conservadora |
-| **H4 — Confusão por urbanização e porte** | **Sustentada** | Atenuação das associações após controles contextuais |
-| **H5 — Municípios com perfis semelhantes apresentam padrões de risco semelhantes** | **Sustentada parcialmente** | Diferenças de risco entre clusters, mas separação limitada (`silhouette = 0,1882`) |
+| **H1 — Infraestrutura escolar como fator contextual associado ao risco** | **Sustentada** | SHAP, Permutation Importance e Partial Dependence demonstraram relevância de características de infraestrutura para o risco previsto, embora a direção e a magnitude das associações variem conforme a variável e o contexto territorial. |
+| **H2 — Indicadores contemporâneos ao resultado configuram data leakage** | **Confirmada** | A análise exploratória demonstrou correspondência exata entre `proficiencia` e a definição do target, caracterizando vazamento de informação quando utilizada como preditora. |
+| **H3 — Meta municipal contém informação preditiva adicional, mas possui natureza contextual** | **Sustentada** | A análise de ablação demonstrou contribuição preditiva de `meta_alfabetizacao_2025`; sua natureza agregada e institucional motivou uma decisão conservadora sobre sua utilização no modelo final. |
+| **H4 — Confusão por urbanização e porte** | **Sustentada** | Análises estratificadas e correlações parciais mostraram atenuação de associações contraintuitivas após o controle de características contextuais. |
+| **H5 — Municípios com perfis semelhantes apresentam padrões de risco semelhantes** | **Sustentada parcialmente** | Os clusters apresentaram diferenças de risco e resultado observado, mas a separação entre os grupos foi limitada (`silhouette = 0,1882`). |
 
 O fechamento das hipóteses evidencia que o processo analítico não foi orientado
 apenas pela busca de desempenho preditivo. Hipóteses foram formuladas, testadas,
@@ -1099,7 +1099,15 @@ O pipeline parte de duas fontes principais:
 1. `data/alunos_modelagem.parquet` — dataset proveniente da camada Gold construída na Fase 2;
 2. microdados oficiais do Censo Escolar de 2022 e 2023.
 
-Os arquivos brutos do Censo Escolar não são armazenados no repositório. Para reproduzir sua preparação desde a fonte original, os ZIPs devem estar disponíveis localmente com os nomes:
+Os microdados do Censo Escolar podem ser obtidos diretamente no portal oficial do
+INEP:
+
+**[Microdados do Censo Escolar — INEP](https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar)**
+
+Para reproduzir a preparação realizada neste projeto, devem ser baixados os
+microdados correspondentes aos anos de **2022 e 2023**.
+
+Os arquivos ZIP devem estar disponíveis localmente com os nomes:
 
 ```text
 microdados_censo_escolar_2022.zip
@@ -1640,22 +1648,7 @@ As funções reutilizáveis possuem docstrings e responsabilidades delimitadas, 
 
 O projeto foi desenvolvido como uma solução analítica reproduzível, mas existem diferentes caminhos para ampliar sua capacidade explicativa, preditiva e operacional.
 
-### 15.1 Incorporar indicadores socioeconômicos
-
-Uma das principais evoluções seria enriquecer a base com indicadores socioeconômicos municipais e territoriais.
-
-Possíveis dimensões incluem:
-
-- renda;
-- vulnerabilidade social;
-- condições socioeconômicas das famílias;
-- características demográficas;
-- condições do território;
-- outros indicadores públicos relacionados ao contexto educacional.
-
-Essa expansão permitiria avaliar se parte das relações atualmente atribuídas ao contexto escolar é explicada por fatores socioeconômicos não representados no modelo atual.
-
-### 15.2 Incorporar novos ciclos avaliativos
+### 15.1 Incorporar novos ciclos avaliativos
 
 A disponibilidade de novos períodos permitiria ampliar a validação temporal.
 
@@ -1677,7 +1670,7 @@ seria possível construir uma sequência de avaliações fora do tempo:
 
 Isso permitiria avaliar estabilidade, degradação de desempenho e mudanças nas relações aprendidas pelo modelo.
 
-### 15.3 Monitorar drift
+### 15.2 Monitorar drift
 
 Uma aplicação recorrente deveria incorporar mecanismos de monitoramento para identificar mudanças na distribuição dos dados e no comportamento do modelo.
 
@@ -1692,7 +1685,7 @@ Entre os elementos possíveis estão:
 
 Essas informações poderiam orientar decisões sobre recalibração ou retreinamento.
 
-### 15.4 Reavaliar o threshold conforme o contexto de uso
+### 15.3 Reavaliar o threshold conforme o contexto de uso
 
 O threshold de **0,2977** foi selecionado pela maximização do F1-score sobre as previsões OOF de 2023.
 
@@ -1702,7 +1695,7 @@ Por exemplo, cenários em que deixar de identificar um território vulnerável p
 
 O threshold deve, portanto, refletir o objetivo operacional da aplicação e não ser tratado como propriedade imutável do algoritmo.
 
-### 15.5 Explorar calibração das probabilidades
+### 15.4 Explorar calibração das probabilidades
 
 Como as probabilidades são utilizadas posteriormente para construir indicadores de risco, uma evolução relevante seria avaliar formalmente sua calibração.
 
@@ -1710,7 +1703,7 @@ Técnicas e diagnósticos específicos poderiam verificar se probabilidades prev
 
 Esse passo seria especialmente importante caso a solução evolua de um mecanismo de ordenação e priorização relativa para uma aplicação que dependa da interpretação probabilística absoluta dos scores.
 
-### 15.6 Ampliar a análise territorial
+### 15.5 Ampliar a análise territorial
 
 A aplicação estratégica pode ser expandida para diferentes níveis de agregação e contexto.
 
@@ -1725,7 +1718,7 @@ Exemplos incluem:
 
 Isso permitiria investigar padrões que não aparecem quando cada município é analisado isoladamente.
 
-### 15.7 Investigar relações causais
+### 15.6 Investigar relações causais
 
 As técnicas utilizadas neste projeto são preditivas e associativas.
 
@@ -1737,21 +1730,6 @@ seriam necessários métodos e desenhos de pesquisa voltados à inferência caus
 
 Essa evolução permitiria distinguir características úteis para **prever risco** daquelas sobre as quais uma intervenção pode efetivamente **produzir mudança no resultado educacional**.
 
-### 15.8 Evoluir a operacionalização
-
-O pipeline atual fornece uma base reproduzível para evolução operacional.
-
-Possíveis extensões incluem:
-
-- execução automatizada do pipeline;
-- testes automatizados;
-- validações de qualidade em integração contínua;
-- registro estruturado de experimentos;
-- versionamento de dados e modelos;
-- monitoramento de desempenho;
-- disponibilização dos indicadores por API ou dashboard.
-
-Essas extensões devem ser implementadas de acordo com a necessidade real de utilização da solução, evitando adicionar complexidade operacional sem benefício correspondente.
 
 ---
 
@@ -1810,7 +1788,6 @@ O projeto foi desenvolvido principalmente em Python e utiliza bibliotecas consol
 ### Fontes de dados
 
 - camada Gold produzida no **Tech Challenge — Fase 2**;
-- dados públicos utilizados no Indicador Criança Alfabetizada;
 - microdados do **Censo Escolar 2022 e 2023**.
 
 ---
